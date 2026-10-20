@@ -1,0 +1,17 @@
+{
+  "name": "Karavan Webasto",
+  "short_name": "Webasto",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0d1426",
+  "theme_color": "#0d1426",
+  "description": "Webasto Bluetooth kontrol ve otomatik termostat",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

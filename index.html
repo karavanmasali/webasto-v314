@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="tr"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="theme-color" content="#0d1426"/><meta name="description" content="Karavan Webasto — Isıtıcı kontrolü"/>
+<title>Karavan Webasto</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml"/>
+<link rel="manifest" href="manifest.webmanifest"/>
+<link rel="stylesheet" href="style.css?v=3.14.0"/>
+<script type="module" src="app.js?v=3.14.0"></script>
+</head><body><main class="shell">
+<header class="top">
+<div aria-hidden="true" class="brand-mark">♨</div>
+<div class="top-title"><h1>Karavan Webasto</h1><p>Isı kontrol merkezi</p></div>
+<span class="pill offline" id="connectionBadge">Bağlı değil</span>
+</header>
+<section class="tab-view" id="tab-control" role="tabpanel" aria-labelledby="tabBtn-control">
+
+<section aria-live="polite" class="connection-line" id="connectionLine">
+<span id="connectionMessage">Webasto bağlantısı bekleniyor.</span>
+<span id="deviceName">—</span>
+</section>
+<section aria-label="Bağlantı" class="connect-buttons">
+<button class="btn primary" id="connectBtn">Bluetooth ile bağlan</button>
+<button class="btn outline" disabled="" id="disconnectBtn">Bağlantıyı kes</button>
+
+</section>
+<section aria-label="Ortam sıcaklığı" class="hero">
+<div class="hero-main"><span class="small-label">ORTAM SICAKLIĞI</span>
+<div class="hero-temp"><span id="roomTemp">—</span><span class="hero-unit">°C</span></div>
+<div class="hero-state"><span class="status-dot" id="heaterDot"></span><strong id="heaterStatus">Veri bekleniyor</strong></div>
+
+</div>
+<div class="hero-side">
+<div class="small-label">CİHAZ HEDEFİ</div><strong id="physicalTarget">—</strong><span>°C</span>
+<div class="separator"></div><div class="small-label">AKÜ</div><strong id="voltage">—</strong><span>V</span>
+</div>
+</section>
+<div class="quick-last" aria-live="polite"><span><span class="last-status-indicator"></span> Son işlem</span><strong id="homeLastAction">Henüz işlem yok</strong></div>
+<section aria-labelledby="autoTitle" class="panel auto-panel" id="autoPanel">
+<div class="panel-title">
+<div><h2 id="autoTitle">Otomatik termostat</h2></div>
+<label class="switch" title="Otomatik termostat tercihi"><input aria-label="Otomatik termostat" id="autoToggle" type="checkbox"/><span class="track"></span></label>
+</div>
+<div aria-live="polite" class="auto-status"><span class="status-dot" id="autoDot"></span><strong id="autoState">Kapalı</strong><span id="autoReason">Otomatik kontrol kapalı.</span></div>
+<div class="thresholds">
+<div class="threshold cold"><span class="threshold-icon">❄</span><span class="threshold-label">START</span><div class="threshold-number"><output id="startValue">20°C</output></div><p>Çalıştır</p>
+<div class="adjust"><button aria-label="START sıcaklığını azalt" id="startMinus">−</button><button aria-label="START sıcaklığını artır" id="startPlus">+</button></div>
+</div>
+<div class="threshold warm"><span class="threshold-icon">☀</span><span class="threshold-label">STOP</span><div class="threshold-number"><output id="stopValue">25°C</output></div><p>Durdur</p>
+<div class="adjust"><button aria-label="STOP sıcaklığını azalt" id="stopMinus">−</button><button aria-label="STOP sıcaklığını artır" id="stopPlus">+</button></div>
+</div>
+</div>
+
+<div class="resume-area" hidden="" id="resumeArea">
+<p id="resumeInfo">Otomatik kontrol güvenlik nedeniyle duraklatıldı.</p>
+<button class="btn primary" id="resumeBtn">Güvenlik kontrolünden sonra devam et</button>
+</div>
+
+</section>
+<section aria-labelledby="manualTitle" class="panel">
+<div class="panel-title"><div><h2 id="manualTitle">Manuel kontrol</h2></div></div>
+<div class="manual-buttons"><button class="btn start" disabled="" id="startBtn">▶ START</button><button class="btn stop" disabled="" id="stopBtn">■ STOP / CLEAR</button></div>
+<div class="manual-target-card" aria-label="Manuel hedef sıcaklık">
+  <div class="manual-target-head"><div><strong>Manuel hedef sıcaklık</strong></div></div>
+  <div class="manual-target-adjust">
+    <button id="manualMinus" aria-label="Manuel hedef sıcaklığını azalt" type="button">−</button>
+    <output id="manualTargetValue" aria-live="polite">23°C</output>
+    <button id="manualPlus" aria-label="Manuel hedef sıcaklığını artır" type="button">+</button>
+  </div>
+  <p class="manual-target-note" id="manualTargetHint" aria-live="polite"></p>
+</div>
+<p aria-live="polite" class="action-result" id="lastTestResult"></p>
+
+</section>
+</section>
+<section class="tab-view" id="tab-history" role="tabpanel" aria-labelledby="tabBtn-history" hidden>
+
+<section aria-labelledby="historyTitle" class="panel">
+<div class="panel-title"><div><h2 id="historyTitle">Çalışma geçmişi</h2></div><span class="muted-count" id="historyCount">0 kayıt</span></div>
+<div class="summary-row"><div><span>Bugünkü START</span><strong id="todayStarts">0</strong></div><div><span>Bugünkü STOP</span><strong id="todayStops">0</strong></div><div><span>Kayıtlı çalışma</span><strong id="todayRuntime">—</strong></div></div>
+<ol class="history-list" id="historyList"><li class="empty">Henüz çalışma kaydı yok.</li></ol>
+<div class="history-actions"><button class="text-button" id="exportHistoryBtn">↓ Geçmişi indir (CSV)</button><button class="text-button muted" id="clearHistoryBtn">Geçmişi temizle</button></div>
+</section>
+<section aria-labelledby="chartTitle" class="panel"><div class="panel-title"><div><h2 id="chartTitle">Sıcaklık geçmişi</h2><p>Son 24 saat · Cihazdan okunan sıcaklık</p></div><span class="muted-count" id="chartCount">0 ölçüm</span></div><div aria-label="Son 24 saatin ortam sıcaklığı grafiği" class="temperature-chart" id="temperatureChart" role="img"><p class="chart-empty">Ölçüm geldikçe grafik oluşacak.</p></div></section>
+</section>
+<section class="tab-view" id="tab-settings" role="tabpanel" aria-labelledby="tabBtn-settings" hidden>
+
+<section aria-labelledby="prefsTitle" class="panel">
+<div class="panel-title"><div><h2 id="prefsTitle">Bildirimler ve görünüm</h2></div></div>
+<div class="setting"><div><strong>Sessiz START / STOP bildirimleri</strong></div><label class="switch small-switch"><input aria-label="Sessiz bildirimler" id="silentToggle" type="checkbox"/><span class="track"></span></label></div>
+<div class="setting"><div><strong>Gece görünümü</strong></div><label class="switch small-switch"><input aria-label="Gece görünümü" id="nightToggle" type="checkbox"/><span class="track"></span></label></div>
+
+</section>
+<section class="panel advanced-panel" aria-labelledby="thermostatSettings"><div class="panel-title"><div><h2 id="thermostatSettings">Termostat ayarları</h2></div></div>
+<details class="advanced"><summary>Bekleme süreleri</summary>
+<div class="setting"><div><strong>STOP bekleme süresi</strong><small>Sıcaklık eşikte kalmalı</small></div><select id="stopDelay"><option value="10">10 sn</option><option value="20">20 sn</option><option value="30">30 sn</option><option value="60">60 sn</option></select></div>
+<div class="setting"><div><strong>Tekrar START beklemesi</strong><small>Soğutma sonrası en az</small></div><select id="restartDelay"><option value="120">2 dakika</option><option value="180">3 dakika</option><option value="300">5 dakika</option><option value="600">10 dakika</option></select></div>
+</details>
+</section>
+<section aria-labelledby="deviceTitle" class="panel device-details">
+<div class="panel-title"><div><h2 id="deviceTitle">Cihaz bilgileri</h2></div><span class="muted-count" id="freshness">Veri yok</span></div>
+<div class="device-grid"><div>Gövde sıcaklığı <strong id="caseTemp">—</strong></div><div>Fan <strong id="fan">—</strong></div><div>Pompa / kızdırma <strong id="pump">—</strong></div><div>Çalışma modu <strong id="deviceMode">—</strong></div></div>
+<details class="advanced"><summary>Servis</summary>
+<div class="actions"><button class="btn outline" disabled="" id="readBtn">Veri oku</button><button class="btn outline" disabled="" id="restoreModeBtn">Mod 0'a dön</button><button class="btn outline" id="exportBtn">Tanı indir</button></div>
+<pre class="logs" id="logOutput">Henüz kayıt yok.</pre>
+</details>
+</section>
+<div class="safety-note"><strong>Güvenlik</strong><p>Uygun havalandırma, egzoz ve çalışan CO alarmı kullan. Bluetooth veya tarayıcı bağlantısı yokken otomatik kontrol devre dışıdır.</p></div>
+</section>
+
+</main><nav class="bottom-nav" role="tablist" aria-label="Uygulama bölümleri">
+<button class="tab-btn current" id="tabBtn-control" role="tab" aria-selected="true" aria-controls="tab-control" data-tab="control" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1z"/></svg><span>Kontrol</span></button>
+<button class="tab-btn" id="tabBtn-history" role="tab" aria-selected="false" aria-controls="tab-history" data-tab="history" tabindex="-1" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 10A9 9 0 1 1 3 13M3.5 4v6H10M12 7v5l3 2"/></svg><span>Geçmiş</span></button>
+<button class="tab-btn" id="tabBtn-settings" role="tab" aria-selected="false" aria-controls="tab-settings" data-tab="settings" tabindex="-1" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 14 4l.7 2.2 2 1.2 2.3-.5 1.5 2.6-1.6 1.8v2.4l1.6 1.8-1.5 2.6-2.3-.5-2 1.2-.7 2.2-3 0-.7-2.2-2-1.2-2.3.5-1.5-2.6 1.6-1.8v-2.4L4.5 9.5 6 6.9l2.3.5 2-1.2.7-2.2z"/><circle cx="12" cy="12" r="3"/></svg><span>Ayarlar</span></button>
+</nav></body></html>
